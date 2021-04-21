@@ -1,0 +1,149 @@
+#+TITLE:Laravel Project
+
+* DOCS
+
+#+begin_src php
+
+#+end_src
+
+* PDF
+
+#+begin_src php
+
+#+end_src
+
+* Log
+
+LINK: http://localhost/logs
+
+#+begin_src shell
+$ composer require rap2hpoutre/laravel-log-viewer
+#+end_src
+
+#+begin_src php
+[ routes/web.php ]
+
+Route::get('logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
+#+end_src
+
+* Notification Mail
+
+Can use mailhog [ served localhost:8025 ] or mailtrap.io > it is suggested to use mailhog on linux system since it is easy to setup:
+
+https://medium.com/@viraljetani/laravel-quickly-send-or-test-emails-while-on-localhost-using-mailhog-and-tinker-viral-jetani-c174662c4a71
+
+#+begin_src shell
+MAIL_DRIVER=smtp
+MAIL_HOST=0.0.0.0
+MAIL_PORT=1025
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_ENCRYPTION=null
+#+end_src
+
+#+begin_src shell
+$ sudo apt install golang-go
+$ go get github.com/mailhog/MailHog
+$ ~/go/bin/MailHog
+#+end_src
+
+LINK: http://localhost/email
+#+begin_src shell
+# Change name as you see fit
+$ php artisan make:mail WelcomeMail -m emails.welcome
+$ php artisan make:mail Grounded -m emails.grounded
+#+end_src
+
+Editable e-mail location: This is markdown formatted as you can see on the usage of hash for header.
+
+#+begin_src php
+[ resources/views/emails/welcome.blade.php ]
+
+@component('mail::message')
+# Introduction
+
+The body of your message.
+
+@component('mail::button', ['url' => ''])
+Button Text
+@endcomponent
+
+Thanks,<br>
+{{ config('app.name') }}
+@endcomponent
+#+end_src
+
+This is the location which control the Mail:
+
+#+begin_src php
+[ app/Mail/Grounded ]
+
+<?php
+
+namespace App\Mail;
+
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Mail\Mailable;
+use Illuminate\Queue\SerializesModels;
+
+class WelcomeMail extends Mailable
+{
+    use Queueable, SerializesModels;
+
+    /**
+     * Create a new message instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        //
+    }
+
+    /**
+     * Build the message.
+     *
+     * @return $this
+     */
+    public function build()
+    {
+        return $this->markdown('emails.welcome');
+    }
+}
+#+end_src
+
+
+This is for the use in routes, you can go to =localhost:8000/email= to check it out.
+
+#+begin_src php
+[ routes/web.php ]
+
+use App\Mail\WelcomeMail;
+use Illuminate\Support\Facades\Mail;
+
+Route::get('send', 'NotifyController@index');
+Route::get('/email', function(){ Mail::to('email@gmail.com')->send(new WelcomeMail());
+        return new WelcomeMail();
+});
+#+end_src
+
+
+Please include the class needed for this to work:
+
+1. =use App\Mail\WelcomeMail;= This is for WelcomeMail.
+2. =use Illuminate\Support\Facades\Mail;= Needed to send email.
+
+#+begin_src php
+[ app/Http/Controllers/PenugasanController.php ]
+
+use App\Mail\WelcomeMail; // TESTING welcome mail ()
+use Illuminate\Support\Facades\Mail; // CLASS IMPORT!
+  public function storepenugasan(Request $request)
+      ...
+
+
+      Mail::to('email@email.com')->send(new WelcomeMail());
+
+  }
+#+end_src
