@@ -21,6 +21,15 @@ $ composer require rap2hpoutre/laravel-log-viewer
 #+end_src
 
 #+begin_src php
+[ config/app.php ]
+
+    'providers' => [
+        ...
+        Rap2hpoutre\LaravelLogViewer\LaravelLogViewerServiceProvider::class,
+    ],
+#+end_src
+
+#+begin_src php
 [ routes/web.php ]
 
 Route::get('logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
@@ -139,10 +148,10 @@ Please include the class needed for this to work:
 
 use App\Mail\WelcomeMail; // TESTING welcome mail ()
 use Illuminate\Support\Facades\Mail; // CLASS IMPORT!
+
   public function storepenugasan(Request $request)
+
       ...
-
-
       Mail::to('email@email.com')->send(new WelcomeMail());
 
   }
